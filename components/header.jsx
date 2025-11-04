@@ -2,13 +2,19 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { useStoreUser } from "@/hooks/use-store-user";
+import {
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  SignedIn,
+  SignedOut,
+  SignOutButton,
+} from "@clerk/nextjs";
+import { useStoreUserEffect as useStoreUser } from "../hooks/use-store-user";
 import { BarLoader } from "react-spinners";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { LayoutDashboard } from "lucide-react";
-import { Authenticated, Unauthenticated } from "convex/react";
 import Image from "next/image";
 
 export default function Header() {
@@ -38,7 +44,7 @@ export default function Header() {
       {/* Center - Glass Navigation Container */}
       <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between gap-2">
         {/* Logo */}
-        <Link href={isAuthenticated ? "/feed" : "/"} className="flex-shrink-0">
+        <Link href={isAuthenticated ? "/feed" : "/"} className="shrink-0">
           <Image
             src="/logo.png"
             alt="Creatr Logo"
@@ -67,8 +73,8 @@ export default function Header() {
         )}
 
         {/* Auth Actions */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-          <Authenticated>
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <SignedIn>
             {/* Show Dashboard link on feed page */}
             {path === "/feed" && (
               <Link href="/dashboard">
@@ -88,11 +94,20 @@ export default function Header() {
                   userPreviewMainIdentifier: "font-semibold text-white",
                 },
               }}
-              afterSignOutUrl="/"
             />
-          </Authenticated>
 
-          <Unauthenticated>
+            {/* Explicit logout button (modern API) */}
+            <SignOutButton redirectUrl="/">
+              <button
+                className="hidden sm:inline-block px-3 py-1 rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 text-sm"
+                aria-label="Sign out"
+              >
+                Logout
+              </button>
+            </SignOutButton>
+          </SignedIn>
+
+          <SignedOut>
             <SignInButton>
               <Button variant="glass" className="" size="sm">
                 Sign In
@@ -104,7 +119,7 @@ export default function Header() {
                 Get Started
               </Button>
             </SignUpButton>
-          </Unauthenticated>
+          </SignedOut>
         </div>
 
         {isLoading && (

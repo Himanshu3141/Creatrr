@@ -1,4 +1,6 @@
-import { useUser } from "@clerk/clerk-react";
+"use client";
+
+import { useUser } from "@clerk/nextjs"; // <-- use @clerk/nextjs, not @clerk/clerk-react
 import { useConvexAuth } from "convex/react";
 import { useEffect, useState } from "react";
 import { useMutation } from "convex/react";
@@ -12,25 +14,45 @@ export function useStoreUserEffect() {
   // has stored the user.
   const [userId, setUserId] = useState<Id<"users"> | null>(null);
   const storeUser = useMutation(api.users.store);
+
   // Call the `storeUser` mutation function to store
   // the current user in the `users` table and return the `Id` value.
   useEffect(() => {
+    console.log(
+      "[useStoreUserEffect] effect run — isLoading:",
+      isLoading,
+      "isAuthenticated:",
+      isAuthenticated,
+      "clerk user id:",
+      user?.id
+    );
+
     // If the user is not logged in don't do anything
     if (!isAuthenticated) {
       return;
     }
+
     // Store the user in the database.
     // Recall that `storeUser` gets the user information via the `auth`
     // object on the server. You don't need to pass anything manually here.
     async function createUser() {
-      const id = await storeUser();
-      setUserId(id);
+      try {
+        const id = await storeUser();
+        console.log("[useStoreUserEffect] storeUser succeeded, id:", id);
+        setUserId(id);
+      } catch (err) {
+        console.error("[useStoreUserEffect] storeUser failed:", err);
+        // keep userId null so UI knows it's not complete
+        setUserId(null);
+      }
     }
+
     createUser();
     return () => setUserId(null);
     // Make sure the effect reruns if the user logs in with
     // a different identity
-  }, [isAuthenticated, storeUser, user?.id]);
+  }, [isAuthenticated, storeUser, user?.id, isLoading]);
+
   // Combine the local state with the state from context
   return {
     isLoading: isLoading || (isAuthenticated && userId === null),
