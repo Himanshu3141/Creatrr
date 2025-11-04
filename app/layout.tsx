@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ConvexClientProvider } from "@/app/ConvexClientProvider";
+import { ConvexClientProvider } from  "@/app/ConvexClientProvider";
 import { dark } from "@clerk/themes";
 
 const inter = Inter({
