@@ -186,7 +186,7 @@ export default function DashboardLayout({ children }) {
                     userPreviewMainIdentifier: "font-semibold text-white",
                   },
                 }}
-                afterSignOutUrl="/"
+                signOutFallbackRedirectUrl="/"
               />
             </div>
           </div>
