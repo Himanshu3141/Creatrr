@@ -56,6 +56,7 @@ export default function SettingsPage() {
     api.users.updateUsername
   );
 
+
   // Form setup
   const form = useForm<UsernameFormData>({
     resolver: zodResolver(usernameSchema),

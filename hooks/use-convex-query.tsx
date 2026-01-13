@@ -15,14 +15,13 @@ interface UseConvexMutationReturn<Args extends any[], Data> {
   error: Error | null;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function useConvexQuery<Data = any>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
   query: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   ...args: any[]
 ): UseConvexQueryReturn<Data> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = useQuery(
     query,
     ...(args.length > 0 ? [args[0]] : [])
@@ -56,24 +55,23 @@ export function useConvexQuery<Data = any>(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function useConvexMutation<Data = any>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   mutation: any
 ): UseConvexMutationReturn<any[], Data> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const mutationFn = useMutation(mutation);
   const [data, setData] = useState<Data | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
   const mutate = async (...args: any[]): Promise<Data> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response = (await (args.length > 0
         ? mutationFn(args[0])
         : mutationFn())) as Data;
