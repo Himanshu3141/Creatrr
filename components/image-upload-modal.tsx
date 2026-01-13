@@ -38,7 +38,12 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { buildTransformationUrl, uploadToImageKit } from "@/lib/imagekit";
+import {
+  buildTransformationUrl,
+  uploadToImageKit,
+  type ImageKitTransformation,
+  type GravityValue,
+} from "@/lib/imagekit";
 
 // Form validation schema
 const transformationSchema = z.object({
@@ -180,7 +185,7 @@ export default function ImageUploadModal({
         setTransformedImage(imageUrl ? imageUrl : null);
         setActiveTab("transform");
         toast.success("Image uploaded successfully!");
-      } else {
+      } else if (!result.success) {
         toast.error(result.error || "Upload failed");
       }
     } catch (error) {
@@ -206,7 +211,7 @@ export default function ImageUploadModal({
     setIsTransforming(true);
 
     try {
-      let transformationChain = [];
+      const transformationChain: ImageKitTransformation[] = [];
 
       // Aspect ratio and resizing
       if (watchedValues.aspectRatio !== "original") {
@@ -247,7 +252,7 @@ export default function ImageUploadModal({
             "#",
             ""
           ),
-          gravity: watchedValues.textPosition,
+          gravity: watchedValues.textPosition as GravityValue,
           overlayTextPadding: 10,
         });
       }
