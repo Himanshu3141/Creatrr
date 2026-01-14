@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import type { Doc, Id } from "./_generated/dataModel";
 
 export const store = mutation({
   args: {},
@@ -122,3 +123,39 @@ export const updateUsername = mutation({
   },
 });
 
+// Get user by username (for public profiles)
+export const getByUsername = query({
+  args: { username: v.string() },
+  handler: async (
+    ctx,
+    args: { username: string }
+  ): Promise<{
+    _id: Id<"users">;
+    name: string;
+    username: string | undefined;
+    imageUrl: string | undefined;
+    createdAt: number;
+  } | null> => {
+    if (!args.username) {
+      return null;
+    }
+
+    const user: Doc<"users"> | null = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("username"), args.username))
+      .unique();
+
+    if (!user) {
+      return null;
+    }
+
+    // Return only public fields
+    return {
+      _id: user._id,
+      name: user.name,
+      username: user.username,
+      imageUrl: user.imageUrl,
+      createdAt: user.createdAt,
+    };
+  },
+});
