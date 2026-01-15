@@ -48,7 +48,11 @@
     "imagekit": "^6.0.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.552.0",
+<<<<<<< HEAD
     "next": "16.1.2",
+=======
+    "next": "16.0.10",
+>>>>>>> 184f3525e47abd43030ce408f36b5c0b45b06fd6
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-chartjs-2": "^5.3.1",
