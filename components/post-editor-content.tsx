@@ -240,18 +240,7 @@ export default function PostEditorContent({
 
           {/* AI Tools */}
           <div>
-            {!hasContent ? (
-              <Button
-                onClick={() => handleAI("generate")}
-                disabled={!hasTitle || isGenerating || isImproving}
-                variant="primary"
-                size="sm"
-                className="w-full"
-              >
-                <Wand2 className="h-4 w-4 mr-2" />
-                Generate Content with AI
-              </Button>
-            ) : (
+            {hasContent && (
               <div className="grid grid-cols-3 w-full gap-3">
                 {(
                   [
@@ -274,11 +263,6 @@ export default function PostEditorContent({
                 ))}
               </div>
             )}
-            {!hasTitle && (
-              <p className="text-xs text-[#6B7280] w-full pt-2">
-                Add a title to enable AI content generation
-              </p>
-            )}
           </div>
 
           {(isGenerating || isImproving) && (
@@ -287,34 +271,20 @@ export default function PostEditorContent({
 
           {/* Editor */}
           <div className="prose prose-lg max-w-none bg-[#111318] rounded-xl p-6 border border-[#1F2228] relative">
-            {!hasTitle && (
-              <div className="absolute inset-0 bg-[#0B0D10]/80 backdrop-blur-sm rounded-xl z-50 flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <p className="text-[#9CA3AF] text-lg font-medium">
-                    Add a title to start writing
-                  </p>
-                  <p className="text-[#6B7280] text-sm">
-                    Your post needs a powerful title before you can begin editing
-                  </p>
-                </div>
-              </div>
-            )}
             <ReactQuill
               // @ts-expect-error - react-quill-new types don't properly support ref
               ref={quillRef}
               theme="snow"
               value={watchedValues.content || ""}
               onChange={(content: string) => setValue("content", content)}
-              readOnly={!hasTitle}
-              modules={hasTitle ? getQuillModules() : { toolbar: false }}
+              readOnly={false}
+              modules={getQuillModules()}
               formats={quillConfig.formats}
-              placeholder={hasTitle ? "Start writing… or let AI help you shape your thoughts." : ""}
+              placeholder="Start writing… or let AI help you shape your thoughts."
               style={{
                 minHeight: "400px",
                 fontSize: "1.125rem",
                 lineHeight: "1.7",
-                opacity: hasTitle ? 1 : 0.5,
-                pointerEvents: hasTitle ? "auto" : "none",
               }}
             />
             {errors.content && (
