@@ -89,13 +89,13 @@ const PostCard: React.FC<PostCardProps> = ({
       if (post.scheduledFor && post.scheduledFor > Date.now()) {
         return {
           variant: "secondary",
-          className: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+          className: "bg-zinc-800/50 text-[#A1A1AA] border-zinc-700",
           label: "Scheduled",
         };
       }
       return {
         variant: "default",
-        className: "bg-green-500/20 text-green-300 border-green-500/30",
+        className: "bg-zinc-800/50 text-[#A1A1AA] border-zinc-700",
         label: "Published",
       };
     }
@@ -122,7 +122,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
   return (
     <Card
-      className={`card-glass hover:border-purple-500/50 transition-colors ${className}`}
+      className={`card-glass transition-colors ${className}`}
     >
       <CardContent>
         <div className="space-y-4">
@@ -154,7 +154,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   {statusBadge.label}
                 </Badge>
                 {post.scheduledFor && post.scheduledFor > Date.now() && (
-                  <div className="flex items-center text-xs text-blue-400">
+                  <div className="flex items-center text-xs text-[#A1A1AA]">
                     <Calendar className="h-3 w-3 mr-1" />
                     {new Date(post.scheduledFor).toLocaleDateString()}
                   </div>
@@ -165,7 +165,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 href={publicUrl || "#"}
                 className={!publicUrl ? "pointer-events-none" : ""}
               >
-                <h3 className="text-xl font-bold text-white hover:text-purple-300 transition-colors line-clamp-2">
+                <h3 className="text-xl font-bold text-[#EDEEF0] hover:text-[#D1D5DB] transition-colors line-clamp-2">
                   {post.title}
                 </h3>
               </Link>
@@ -254,7 +254,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs"
+                  className="bg-zinc-800/50 text-[#A1A1AA] border-zinc-700 text-xs"
                 >
                   {tag}
                 </Badge>

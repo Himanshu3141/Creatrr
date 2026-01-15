@@ -147,7 +147,7 @@ export default function PostEditorSettings({
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    className="bg-zinc-800/50 text-[#A1A1AA] border-zinc-700"
                   >
                     {tag}
                     <button

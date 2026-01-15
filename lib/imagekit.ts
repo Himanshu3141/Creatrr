@@ -33,14 +33,17 @@ export const buildTransformationUrl = (
   if (!transformations.length) return src;
 
   // Convert transformation objects to URL parameters
-  const transformParams = transformations
+  const transformParamStrings = transformations
     .map((transform) => {
       const params: string[] = [];
 
       // Handle resizing transformations
       if (transform.width) params.push(`w-${transform.width}`);
       if (transform.height) params.push(`h-${transform.height}`);
-      if (transform.focus) params.push(`fo-${transform.focus}`);
+      if (transform.focus && transform.focus.trim()) {
+        // ImageKit focus values: auto, face, etc.
+        params.push(`fo-${transform.focus.trim()}`);
+      }
       if (transform.cropMode) params.push(`cm-${transform.cropMode}`);
 
       // Handle effects
@@ -54,8 +57,6 @@ export const buildTransformationUrl = (
         const layerParams: string[] = [
           `l-text`,
           `i-${encodeURIComponent(transform.overlayText)}`,
-          `tg-bold`,
-          `lx-20,ly-20`,
         ];
 
         if (transform.overlayTextFontSize)
@@ -90,19 +91,46 @@ export const buildTransformationUrl = (
 
       return params.join(",");
     })
-    .filter((param) => param.length > 0)
-    .join(":");
+    .filter((param) => param.length > 0);
+
+  if (transformParamStrings.length === 0) return src;
+
+  // Join transformations with : (each transform group separated by :)
+  const transformParams = transformParamStrings.join(":");
 
   // Insert transformation parameters into URL
-  if (src.includes("/tr:")) {
-    // Already has transformations, append to existing
-    return src.replace("/tr:", `/tr:${transformParams}:`);
-  } else {
-    // Add new transformations
-    const urlParts = src.split("/");
-    const fileIndex = urlParts.length - 1;
-    urlParts.splice(fileIndex, 0, `tr:${transformParams}`);
-    return urlParts.join("/");
+  // ImageKit format: https://ik.imagekit.io/endpoint/tr:param1,param2:param3/image.jpg
+  try {
+    const url = new URL(src);
+    const pathParts = url.pathname.split("/").filter((p) => p);
+    
+    // Remove any existing tr: transformation
+    const pathWithoutTr = pathParts.filter((p) => !p.startsWith("tr:"));
+    const filename = pathWithoutTr[pathWithoutTr.length - 1];
+    const basePath = pathWithoutTr.slice(0, -1);
+    
+    // Build new path with transformations
+    const newPath = [...basePath, `tr:${transformParams}`, filename]
+      .filter((p) => p)
+      .join("/");
+    
+    url.pathname = `/${newPath}`;
+    return url.toString();
+  } catch {
+    // Fallback for relative URLs or invalid URLs
+    if (src.includes("/tr:")) {
+      // Already has transformations, replace
+      const baseUrl = src.split("/tr:")[0];
+      const afterTr = src.split("/tr:")[1];
+      const filename = afterTr.split("/").pop() || "";
+      return `${baseUrl}/tr:${transformParams}/${filename}`;
+    } else {
+      // Add new transformations before the filename
+      const urlParts = src.split("/");
+      const filename = urlParts[urlParts.length - 1];
+      const basePath = urlParts.slice(0, -1).join("/");
+      return `${basePath}/tr:${transformParams}/${filename}`;
+    }
   }
 };
   

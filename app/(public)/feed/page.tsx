@@ -107,14 +107,22 @@ export default function FeedPage(): React.JSX.Element {
     feedLoading || (activeTab === "trending" && trendingLoading);
   
   return (
-    <div className="min-h-screen bg-slate-900 text-white pt-32 pb-5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen text-[#A1A1AA] pt-32 pb-12 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Feed Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold gradient-text-primary pb-2">
+        <div className="text-center mb-12">
+          <h1 
+            className="text-5xl md:text-6xl font-bold pb-3 tracking-tight"
+            style={{
+              background: "linear-gradient(90deg, #F9FAFB, #E5E7EB, #9CA3AF, #F3F4F6)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            } as React.CSSProperties}
+          >
             Discover Amazing Content
           </h1>
-          <p className="text-slate-400">
+          <p className="text-[#9CA3AF] text-lg leading-relaxed mt-2">
             Stay up to date with the latest posts from creators you follow
           </p>
         </div>
@@ -123,31 +131,37 @@ export default function FeedPage(): React.JSX.Element {
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
           <div className="lg:col-span-4 space-y-6">
             {/* Feed Tabs */}
-            <div className="flex space-x-2">
-              <Button
+            <div className="flex space-x-3 p-1 bg-[#0B0D10] rounded-xl border border-[#1F2228]">
+              <button
                 onClick={() => setActiveTab("feed")}
-                variant={activeTab === "feed" ? "primary" : "ghost"}
-                className="flex-1"
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  activeTab === "feed"
+                    ? "bg-gradient-to-b from-[#F9FAFB] to-[#D4D4D8] text-[#0B0D10] shadow-sm"
+                    : "text-[#9CA3AF] hover:text-[#D1D5DB] hover:bg-[#111318]/50"
+                }`}
               >
                 For You
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => setActiveTab("trending")}
-                variant={activeTab === "trending" ? "primary" : "ghost"}
-                className="flex-1"
+                className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center ${
+                  activeTab === "trending"
+                    ? "bg-gradient-to-b from-[#F9FAFB] to-[#D4D4D8] text-[#0B0D10] shadow-sm"
+                    : "text-[#9CA3AF] hover:text-[#D1D5DB] hover:bg-[#111318]/50"
+                }`}
               >
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Trending
-              </Button>
+              </button>
             </div>
 
             {/* Create Post Prompt */}
             {currentUser && (
               <Link
                 href="/dashboard/create"
-                className="flex items-center space-x-3 cursor-pointer"
+                className="flex items-center space-x-3 cursor-pointer group"
               >
-                <div className="relative w-10 h-10">
+                <div className="relative w-10 h-10 flex-shrink-0">
                   {currentUser.imageUrl ? (
                     <Image
                       src={currentUser.imageUrl}
@@ -157,14 +171,14 @@ export default function FeedPage(): React.JSX.Element {
                       sizes="40px"
                     />
                   ) : (
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-sm font-bold">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-[#9CA3AF] to-[#6B7280] flex items-center justify-center text-sm font-bold text-[#0B0D10]">
                       {(currentUser.firstName || "U").charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="bg-slate-800 border border-slate-600 rounded-full px-4 py-3 text-slate-400 hover:border-slate-500 transition-colors">
-                    What's on your mind? Share your thoughts...
+                  <div className="bg-[#111318] border border-[#1F2228] rounded-xl px-4 py-3 text-[#6B7280] hover:border-[#E5E7EB]/20 hover:bg-[#16181D] focus-within:border-[#E5E7EB]/30 focus-within:bg-[#16181D] transition-all duration-200 group-hover:shadow-sm">
+                    Share an idea, thought, or update…
                   </div>
                 </div>
               </Link>
@@ -173,26 +187,30 @@ export default function FeedPage(): React.JSX.Element {
             {/* Posts Feed */}
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-purple-400 mx-auto mb-4" />
-                  <p className="text-slate-400">Loading posts...</p>
-                </div>
+                  <div className="text-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-[#9CA3AF] mx-auto mb-4" />
+                    <p className="text-[#9CA3AF]">Loading posts...</p>
+                  </div>
               </div>
             ) : currentPosts.length === 0 ? (
               <Card className="card-glass">
-                <CardContent className="text-center py-12">
-                  <div className="space-y-4">
-                    <div className="text-6xl">📝</div>
+                <CardContent className="text-center py-16 px-6">
+                  <div className="space-y-5">
+                    <div className="flex justify-center">
+                      <div className="w-16 h-16 rounded-full bg-[#111318] border border-[#1F2228] flex items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-[#9CA3AF]" />
+                      </div>
+                    </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white mb-2">
+                      <h3 className="text-2xl font-bold text-[#EDEEF0] mb-3">
                         {activeTab === "trending"
                           ? "No trending posts right now"
                           : "No posts to show"}
                       </h3>
-                      <p className="text-slate-400 mb-6">
+                      <p className="text-[#9CA3AF] text-base leading-relaxed max-w-md mx-auto">
                         {activeTab === "trending"
                           ? "Check back later for trending content"
-                          : "Follow some creators to see their posts here"}
+                          : "Your feed is empty for now — follow creators to see ideas appear here."}
                       </p>
                     </div>
                   </div>
@@ -203,20 +221,24 @@ export default function FeedPage(): React.JSX.Element {
                 {/* Posts Grid */}
                 <div className="space-y-6">
                   {currentPosts.map((post: Post) => (
-                    <PostCard
+                    <div 
                       key={post._id}
-                      post={post}
-                      showActions={false}
-                      showAuthor={true}
-                      className="max-w-none"
-                    />
+                      className="transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                      <PostCard
+                        post={post}
+                        showActions={false}
+                        showAuthor={true}
+                        className="max-w-none"
+                      />
+                    </div>
                   ))}
                 </div>
 
                 {/* Load More Indicator */}
                 {activeTab === "feed" && feedData?.hasMore && (
                   <div ref={loadMoreRef} className="flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
+                    <Loader2 className="h-6 w-6 animate-spin text-[#9CA3AF]" />
                   </div>
                 )}
               </>
@@ -228,19 +250,19 @@ export default function FeedPage(): React.JSX.Element {
             {/* Suggested Users */}
             <Card className="card-glass">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Sparkles className="h-5 w-5 mr-2" />
+                <CardTitle className="text-[#EDEEF0] flex items-center">
+                  <Sparkles className="h-5 w-5 mr-2 text-[#9CA3AF]" />
                   Suggested Users
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {suggestionsLoading ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-purple-400" />
+                    <Loader2 className="h-5 w-5 animate-spin text-[#9CA3AF]" />
                   </div>
                 ) : !suggestedUsers || suggestedUsers.length === 0 ? (
                   <div className="text-center py-4">
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-[#6B7280] text-sm">
                       No suggestions available
                     </p>
                   </div>
@@ -261,17 +283,17 @@ export default function FeedPage(): React.JSX.Element {
                                     sizes="40px"
                                   />
                                 ) : (
-                                  <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-sm font-bold">
+                                  <div className="w-full h-full rounded-full bg-gradient-to-br from-[#9CA3AF] to-[#6B7280] flex items-center justify-center text-sm font-bold text-[#0B0D10]">
                                     {user.name.charAt(0).toUpperCase()}
                                   </div>
                                 )}
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-white">
+                                <p className="text-sm font-medium text-[#EDEEF0]">
                                   {user.name}
                                 </p>
                                 {user.username && (
-                                  <p className="text-xs text-slate-400">
+                                  <p className="text-xs text-[#6B7280]">
                                     @{user.username}
                                   </p>
                                 )}
@@ -282,18 +304,18 @@ export default function FeedPage(): React.JSX.Element {
                             onClick={() => handleFollowToggle(user._id)}
                             variant="outline"
                             size="sm"
-                            className="border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white"
+                            className="border-[#1F2228] text-[#A1A1AA] hover:bg-[#16181D] hover:text-[#EDEEF0] hover:border-[#1F2228]"
                           >
                             <UserPlus className="h-3 w-3 mr-1" />
                             Follow
                           </Button>
                         </div>
-                        <div className="text-xs text-slate-500 pl-13">
+                        <div className="text-xs text-[#6B7280] pl-13">
                           {user.followerCount} followers • {user.postCount}{" "}
                           posts
                         </div>
                         {user.recentPosts && user.recentPosts.length > 0 && (
-                          <div className="text-xs text-slate-400 pl-13">
+                          <div className="text-xs text-[#9CA3AF] pl-13">
                             Latest: "
                             {user.recentPosts[0].title.substring(0, 30)}..."
                           </div>

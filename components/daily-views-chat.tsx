@@ -42,7 +42,7 @@ const DailyViewsChart: React.FC<DailyViewsChartProps> = ({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#A1A1AA]" />
       </div>
     );
   }

@@ -72,10 +72,10 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
   if (userLoading || postsLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-slate-400">Loading profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A1A1AA] mx-auto mb-4"></div>
+          <p className="text-[#6B7280]">Loading profile...</p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen text-[#A1A1AA]">
       <PublicHeader link="/" title="Back to Home" />
 
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -132,7 +132,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             {user.name}
           </h1>
 
-          <p className="text-xl text-slate-400 mb-4">@{user.username}</p>
+          <p className="text-xl text-[#6B7280] mb-4">@{user.username}</p>
 
           {/* Follow Button */}
           {!isOwnProfile && currentUser && (
@@ -156,7 +156,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             </Button>
           )}
 
-          <div className="flex items-center justify-center text-sm text-slate-500">
+          <div className="flex items-center justify-center text-sm text-[#4B5563]">
             <Calendar className="h-4 w-4 mr-2" />
             Joined{" "}
             {new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -169,22 +169,22 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         {/* Stats */}
         <div className="flex justify-center gap-8 mb-12">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">{posts.length}</div>
-            <div className="text-sm text-slate-400">Posts</div>
+            <div className="text-2xl font-bold text-[#EDEEF0]">{posts.length}</div>
+            <div className="text-sm text-[#6B7280]">Posts</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-[#EDEEF0]">
               {followerCount || 0}
             </div>
-            <div className="text-sm text-slate-400">Followers</div>
+            <div className="text-sm text-[#6B7280]">Followers</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-[#EDEEF0]">
               {posts
                 .reduce((acc, post) => acc + post.viewCount, 0)
                 .toLocaleString()}
             </div>
-            <div className="text-sm text-slate-400">Total Views</div>
+            <div className="text-sm text-[#6B7280]">Total Views</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-white">

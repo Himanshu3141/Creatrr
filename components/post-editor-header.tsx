@@ -66,7 +66,12 @@ export default function PostEditorHeader({
   const isEdit = mode === "edit";
 
   return (
-    <header className="sticky top-0 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <header 
+      className="sticky top-0 backdrop-blur-md border-b border-[#1F2228]"
+      style={{
+        background: "linear-gradient(180deg, #0B0D10 0%, #0E1117 40%, #111318 100%)",
+      }}
+    >
       <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Left */}
         <div className="flex items-center space-x-4">

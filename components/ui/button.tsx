@@ -15,14 +15,14 @@ const buttonVariants = cva(
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-gradient-to-b from-[#F5F5F5] to-[#D4D4D8] text-[#0B0D10] border border-[#E5E7EB] rounded-[10px] font-medium hover:from-[#FAFAFA] hover:to-[#E4E4E7] active:from-[#E4E4E7] active:to-[#C4C4C8] shadow-xs",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
        primary:
-          "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-xs", // added
+          "bg-gradient-to-b from-[#F5F5F5] to-[#D4D4D8] text-[#0B0D10] border border-[#E5E7EB] rounded-[10px] font-medium hover:from-[#FAFAFA] hover:to-[#E4E4E7] active:from-[#E4E4E7] active:to-[#C4C4C8] shadow-xs",
         glass:
-          "backdrop-blur-md bg-white/10 border border-white/20 text-white hover:bg-white/20 shadow-xs",
+          "backdrop-blur-md bg-[#111318]/50 border border-[#1F2228] text-[#EDEEF0] hover:bg-[#16181D]/50 shadow-xs",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

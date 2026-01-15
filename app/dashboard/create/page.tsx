@@ -49,7 +49,7 @@ export default function CreatePostPage() {
 
   if (isDraftLoading || userLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center space-x-3">
           <Loader2 className="h-6 w-6 animate-spin text-purple-400" />
           <span className="text-slate-300">Loading...</span>
@@ -60,7 +60,7 @@ export default function CreatePostPage() {
 
   if (!currentUser?.username) {
     return (
-      <div className="h-80 bg-slate-900 flex items-center justify-center p-8">
+      <div className="h-80 bg-[#111318] flex items-center justify-center p-8">
         <div className="max-w-2xl w-full text-center space-y-6">
           <h1 className="text-3xl font-bold text-white">Username Required</h1>
           <p className="text-slate-400 text-lg">

@@ -3,11 +3,22 @@ import type { NextRequest } from "next/server";
 import ImageKit from "imagekit";
 import { auth } from "@clerk/nextjs/server";
 
+// Validate environment variables
+const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
+const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || process.env.NEXT_PUBLIC_IMAGEKIT_PRIVATE_KEY;
+const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
+
+if (!publicKey || !privateKey || !urlEndpoint) {
+  throw new Error(
+    `Missing ImageKit environment variables. Required: NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY (not NEXT_PUBLIC_IMAGEKIT_PRIVATE_KEY), NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT`
+  );
+}
+
 // Initialize ImageKit
 const imagekit = new ImageKit({
-  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
+  publicKey,
+  privateKey,
+  urlEndpoint,
 });
 
 interface UploadSuccessResponse {

@@ -134,6 +134,9 @@ export default function ImageUploadModal({
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isTransforming, setIsTransforming] = useState<boolean>(false);
+  const [isImageReady, setIsImageReady] = useState<boolean>(false);
+  const [transformationError, setTransformationError] = useState<string | null>(null);
+  const [hasAppliedTransformations, setHasAppliedTransformations] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"upload" | "transform">("upload");
 
   const form = useForm<TransformationFormData>({
@@ -154,6 +157,26 @@ export default function ImageUploadModal({
 
   const { watch, setValue, reset } = form;
   const watchedValues = watch();
+
+  // Reset applied flag when transformation settings change
+  React.useEffect(() => {
+    if (hasAppliedTransformations) {
+      // Reset the flag when user changes any transformation settings after applying
+      setHasAppliedTransformations(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    watchedValues.backgroundRemoved,
+    watchedValues.dropShadow,
+    watchedValues.textOverlay,
+    watchedValues.aspectRatio,
+    watchedValues.customWidth,
+    watchedValues.customHeight,
+    watchedValues.smartCropFocus,
+    watchedValues.textFontSize,
+    watchedValues.textColor,
+    watchedValues.textPosition,
+  ]);
 
   // Handle file upload
   const onDrop = useCallback(
@@ -183,6 +206,9 @@ export default function ImageUploadModal({
         setUploadedImage(result.data);
         const imageUrl = result.data?.url;
         setTransformedImage(imageUrl ? imageUrl : null);
+        setIsImageReady(true);
+        setTransformationError(null);
+        setHasAppliedTransformations(false);
         setActiveTab("transform");
         toast.success("Image uploaded successfully!");
       } else if (!result.success) {
@@ -206,8 +232,11 @@ export default function ImageUploadModal({
 
   // Apply transformations
   const applyTransformations = async () => {
-    if (!uploadedImage) return;
+    if (!uploadedImage || isTransforming) return;
 
+    // Clear previous error and mark image as not ready
+    setTransformationError(null);
+    setIsImageReady(false);
     setIsTransforming(true);
 
     try {
@@ -258,28 +287,68 @@ export default function ImageUploadModal({
       }
 
       // Apply transformations
+      console.log("Transformation chain:", transformationChain);
       const transformedUrl = buildTransformationUrl(
         uploadedImage.url,
         transformationChain
       );
+      console.log("Original URL:", uploadedImage.url);
+      console.log("Transformed URL:", transformedUrl);
 
-      // Add a small delay to show loading state and allow ImageKit to process
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setTransformedImage(transformedUrl);
-      toast.success("Transformations applied!");
+      // Preload the transformed image to ensure it's ready
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          // Image loaded successfully, wait a bit more for ImageKit processing
+          setTimeout(() => {
+            setTransformedImage(transformedUrl);
+            setIsImageReady(true);
+            setIsTransforming(false);
+            setHasAppliedTransformations(true);
+            setTransformationError(null);
+            toast.success("Transformations applied!");
+            resolve();
+          }, 500);
+        };
+        img.onerror = () => {
+          setIsTransforming(false);
+          setIsImageReady(false);
+          setHasAppliedTransformations(false);
+          const errorMsg = "Failed to load transformed image. Please try again.";
+          setTransformationError(errorMsg);
+          toast.error(errorMsg);
+          reject(new Error(errorMsg));
+        };
+        img.src = transformedUrl;
+      });
     } catch (error) {
       console.error("Transformation error:", error);
-      toast.error("Failed to apply transformations");
-    } finally {
       setIsTransforming(false);
+      setIsImageReady(false);
+      const errorMsg = error instanceof Error ? error.message : "Image transformation failed. Please try again.";
+      setTransformationError(errorMsg);
+      toast.error(errorMsg);
     }
+  };
+
+  // Check if any transformations are selected
+  const hasActiveTransformations = () => {
+    return !!(
+      watchedValues.backgroundRemoved ||
+      watchedValues.dropShadow ||
+      watchedValues.textOverlay?.trim() ||
+      watchedValues.aspectRatio !== "original"
+    );
   };
 
   // Reset transformations
   const resetTransformations = () => {
+    if (isTransforming) return; // Prevent reset during transformation
     reset();
     setTransformedImage(uploadedImage?.url || null);
+    setIsImageReady(true);
+    setTransformationError(null);
+    setHasAppliedTransformations(false);
   };
 
   // Handle image selection
@@ -302,6 +371,10 @@ export default function ImageUploadModal({
   const resetForm = () => {
     setUploadedImage(null);
     setTransformedImage(null);
+    setIsImageReady(false);
+    setIsTransforming(false);
+    setTransformationError(null);
+    setHasAppliedTransformations(false);
     setActiveTab("upload");
     reset();
   };
@@ -329,9 +402,18 @@ export default function ImageUploadModal({
           }
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload">Upload</TabsTrigger>
-            <TabsTrigger value="transform" disabled={!uploadedImage}>
+          <TabsList className="grid w-full grid-cols-2 p-1 bg-[#0B0D10] rounded-xl border border-[#1F2228] h-auto">
+            <TabsTrigger 
+              value="upload"
+              className="!text-[#EDEEF0] !font-medium data-[state=active]:!bg-gradient-to-b data-[state=active]:!from-[#F9FAFB] data-[state=active]:!to-[#D4D4D8] data-[state=active]:!text-[#0B0D10] data-[state=active]:!shadow-sm data-[state=active]:!font-semibold hover:!text-white hover:!bg-[#111318]/50 data-[state=active]:!border-transparent !border-transparent transition-all duration-200 py-2.5"
+            >
+              Upload
+            </TabsTrigger>
+            <TabsTrigger 
+              value="transform"
+              disabled={!uploadedImage}
+              className="!text-[#EDEEF0] !font-medium data-[state=active]:!bg-gradient-to-b data-[state=active]:!from-[#F9FAFB] data-[state=active]:!to-[#D4D4D8] data-[state=active]:!text-[#0B0D10] data-[state=active]:!shadow-sm data-[state=active]:!font-semibold hover:!text-white hover:!bg-[#111318]/50 data-[state=active]:!border-transparent !border-transparent transition-all duration-200 py-2.5 disabled:!opacity-50 disabled:!cursor-not-allowed disabled:!text-[#6B7280]"
+            >
               Transform
             </TabsTrigger>
           </TabsList>
@@ -341,27 +423,27 @@ export default function ImageUploadModal({
               {...getRootProps()}
               className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                 isDragActive
-                  ? "border-purple-400 bg-purple-400/10"
-                  : "border-slate-600 hover:border-slate-500"
+                  ? "border-[#9CA3AF] bg-[#111318]/50"
+                  : "border-[#1F2228] hover:border-[#9CA3AF]/50"
               }`}
             >
               <input {...getInputProps()} />
 
               {isUploading ? (
                 <div className="space-y-4">
-                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-purple-400" />
-                  <p className="text-slate-300">Uploading image...</p>
+                  <Loader2 className="h-12 w-12 mx-auto animate-spin text-[#D1D5DB]" />
+                  <p className="text-[#EDEEF0] font-medium">Uploading image...</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <Upload className="h-12 w-12 mx-auto text-slate-400" />
+                  <Upload className="h-12 w-12 mx-auto text-[#9CA3AF]" />
                   <div>
-                    <p className="text-lg text-white">
+                    <p className="text-lg text-[#EDEEF0] font-medium">
                       {isDragActive
                         ? "Drop the image here"
                         : "Drag & drop an image here"}
                     </p>
-                    <p className="text-sm text-slate-400 mt-2">
+                    <p className="text-sm text-[#A1A1AA] mt-2">
                       or click to select a file (JPG, PNG, WebP, GIF - Max 10MB)
                     </p>
                   </div>
@@ -373,7 +455,7 @@ export default function ImageUploadModal({
               <div className="text-center space-y-4">
                 <Badge
                   variant="secondary"
-                  className="bg-green-500/20 text-green-300 border-green-500/30"
+                  className="bg-zinc-800/50 text-[#A1A1AA] border-zinc-700"
                 >
                   <Check className="h-3 w-3 mr-1" />
                   Image uploaded successfully!
@@ -404,9 +486,9 @@ export default function ImageUploadModal({
                   </h3>
 
                   {/* Background Removal */}
-                  <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className={`p-4 bg-[#111318] rounded-lg border border-[#1F2228] ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <Label className="text-white font-medium">
+                      <Label className="text-[#EDEEF0] font-medium">
                         Remove Background
                       </Label>
                       <Button
@@ -417,6 +499,7 @@ export default function ImageUploadModal({
                             : "outline"
                         }
                         size="sm"
+                        disabled={isTransforming}
                         onClick={() =>
                           setValue(
                             "backgroundRemoved",
@@ -431,15 +514,15 @@ export default function ImageUploadModal({
                         )}
                       </Button>
                     </div>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-[#9CA3AF]">
                       AI-powered background removal
                     </p>
                   </div>
 
                   {/* Drop Shadow */}
-                  <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className={`p-4 bg-[#111318] rounded-lg border border-[#1F2228] ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <Label className="text-white font-medium">
+                      <Label className="text-[#EDEEF0] font-medium">
                         Drop Shadow
                       </Label>
                       <Button
@@ -448,7 +531,7 @@ export default function ImageUploadModal({
                           watchedValues.dropShadow ? "default" : "outline"
                         }
                         size="sm"
-                        disabled={!watchedValues.backgroundRemoved}
+                        disabled={isTransforming || !watchedValues.backgroundRemoved}
                         onClick={() =>
                           setValue("dropShadow", !watchedValues.dropShadow)
                         }
@@ -460,7 +543,7 @@ export default function ImageUploadModal({
                         )}
                       </Button>
                     </div>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-[#9CA3AF]">
                       {watchedValues.backgroundRemoved
                         ? "Add realistic shadow"
                         : "Requires background removal"}
@@ -475,11 +558,12 @@ export default function ImageUploadModal({
                     Resize & Crop
                   </h3>
 
-                  <div className="space-y-3">
-                    <Label className="text-white">Aspect Ratio</Label>
+                  <div className={`space-y-3 ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
+                    <Label className="text-[#EDEEF0]">Aspect Ratio</Label>
                     <Select
                       value={watchedValues.aspectRatio}
                       onValueChange={(value) => setValue("aspectRatio", value)}
+                      disabled={isTransforming}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -495,9 +579,9 @@ export default function ImageUploadModal({
                   </div>
 
                   {watchedValues.aspectRatio === "custom" && (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className={`grid grid-cols-2 gap-3 ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
                       <div>
-                        <Label className="text-white">Width</Label>
+                        <Label className="text-[#EDEEF0]">Width</Label>
                         <Input
                           type="number"
                           value={watchedValues.customWidth}
@@ -509,10 +593,11 @@ export default function ImageUploadModal({
                           }
                           min="100"
                           max="2000"
+                          disabled={isTransforming}
                         />
                       </div>
                       <div>
-                        <Label className="text-white">Height</Label>
+                        <Label className="text-[#EDEEF0]">Height</Label>
                         <Input
                           type="number"
                           value={watchedValues.customHeight}
@@ -524,19 +609,21 @@ export default function ImageUploadModal({
                           }
                           min="100"
                           max="2000"
+                          disabled={isTransforming}
                         />
                       </div>
                     </div>
                   )}
 
                   {watchedValues.aspectRatio !== "original" && (
-                    <div className="space-y-3">
-                      <Label className="text-white">Smart Crop Focus</Label>
+                    <div className={`space-y-3 ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
+                      <Label className="text-[#EDEEF0]">Smart Crop Focus</Label>
                       <Select
                         value={watchedValues.smartCropFocus}
                         onValueChange={(value) =>
                           setValue("smartCropFocus", value)
                         }
+                        disabled={isTransforming}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -560,20 +647,21 @@ export default function ImageUploadModal({
                     Text Overlay
                   </h3>
 
-                  <div className="space-y-3">
-                    <Label className="text-white">Text</Label>
+                  <div className={`space-y-3 ${isTransforming ? "opacity-50 pointer-events-none" : ""}`}>
+                    <Label className="text-[#EDEEF0]">Text</Label>
                     <Textarea
                       value={watchedValues.textOverlay}
                       onChange={(e) => setValue("textOverlay", e.target.value)}
                       placeholder="Enter text to overlay..."
                       rows={3}
+                      disabled={isTransforming}
                     />
                   </div>
 
                   {watchedValues.textOverlay && (
-                    <>
+                    <div className={isTransforming ? "opacity-50 pointer-events-none" : ""}>
                       <div className="space-y-3">
-                        <Label className="text-white">
+                        <Label className="text-[#EDEEF0]">
                           Font Size: {watchedValues.textFontSize}px
                         </Label>
                         <Slider
@@ -585,27 +673,30 @@ export default function ImageUploadModal({
                           min={12}
                           step={2}
                           className="w-full"
+                          disabled={isTransforming}
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-3 mt-3">
                         <div className="space-y-2">
-                          <Label className="text-white">Text Color</Label>
+                          <Label className="text-[#EDEEF0]">Text Color</Label>
                           <Input
                             type="color"
                             value={watchedValues.textColor}
                             onChange={(e) =>
                               setValue("textColor", e.target.value)
                             }
+                            disabled={isTransforming}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-white">Position</Label>
+                          <Label className="text-[#EDEEF0]">Position</Label>
                           <Select
                             value={watchedValues.textPosition}
                             onValueChange={(value) =>
                               setValue("textPosition", value)
                             }
+                            disabled={isTransforming}
                           >
                             <SelectTrigger>
                               <SelectValue />
@@ -623,7 +714,7 @@ export default function ImageUploadModal({
                           </Select>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
 
@@ -633,6 +724,7 @@ export default function ImageUploadModal({
                     onClick={applyTransformations}
                     disabled={isTransforming}
                     variant={"primary"}
+                    className="disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isTransforming ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -642,7 +734,12 @@ export default function ImageUploadModal({
                     Apply Transformations
                   </Button>
 
-                  <Button onClick={resetTransformations} variant="outline">
+                  <Button 
+                    onClick={resetTransformations} 
+                    variant="outline"
+                    disabled={isTransforming}
+                    className="disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Reset
                   </Button>
@@ -651,48 +748,84 @@ export default function ImageUploadModal({
 
               {/* Image Preview */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-white flex items-center">
-                  <ImageIcon className="h-5 w-5 mr-2" />
+                <h3 className="text-lg font-semibold text-[#EDEEF0] flex items-center">
+                  <ImageIcon className="h-5 w-5 mr-2 text-[#9CA3AF]" />
                   Preview
                 </h3>
 
-                {transformedImage && (
+                {/* Loading State - Show when transforming */}
+                {isTransforming && (
+                  <div className="bg-[#111318] rounded-lg p-12 border border-[#1F2228] flex flex-col items-center justify-center min-h-[300px]">
+                    <Loader2 className="h-12 w-12 animate-spin text-[#9CA3AF] mb-4" />
+                    <p className="text-[#EDEEF0] font-medium text-lg mb-2">
+                      Image is transforming...
+                    </p>
+                    <p className="text-[#9CA3AF] text-sm">
+                      This may take a few seconds
+                    </p>
+                  </div>
+                )}
+
+                {/* Error State */}
+                {transformationError && !isTransforming && (
+                  <div className="bg-[#111318] rounded-lg p-6 border border-[#1F2228]">
+                    <div className="flex items-start space-x-3">
+                      <X className="h-5 w-5 text-[#9CA3AF] mt-0.5" />
+                      <div>
+                        <p className="text-[#EDEEF0] font-medium mb-1">
+                          Transformation Failed
+                        </p>
+                        <p className="text-[#9CA3AF] text-sm">
+                          {transformationError}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Image Preview - Only show when ready and not transforming */}
+                {transformedImage && !isTransforming && isImageReady && (
                   <div className="relative">
-                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <div className="bg-[#111318] rounded-lg p-4 border border-[#1F2228]">
                       <img
                         src={transformedImage}
                         alt="Transformed preview"
                         className="w-full h-auto max-h-96 object-contain rounded-lg mx-auto"
                         onError={() => {
-                          toast.error("Failed to load transformed image");
-                          setTransformedImage(uploadedImage?.url || null);
+                          setIsImageReady(false);
+                          const errorMsg = "Failed to load transformed image";
+                          setTransformationError(errorMsg);
+                          toast.error(errorMsg);
                         }}
                       />
                     </div>
-
-                    {isTransforming && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
-                        <div className="bg-slate-800 rounded-lg p-4 flex items-center space-x-3">
-                          <Loader2 className="h-5 w-5 animate-spin text-purple-400" />
-                          <span className="text-white">
-                            Applying transformations...
-                          </span>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {uploadedImage && transformedImage && (
+                {/* Action Buttons - Only show when image is ready */}
+                {uploadedImage && transformedImage && isImageReady && !isTransforming && (
                   <div className="text-center space-y-4">
-                    <div className="text-sm text-slate-400">
-                      Current image URL ready for use
-                    </div>
+                    {/* Show message if transformations are selected but not applied */}
+                    {hasActiveTransformations() && !hasAppliedTransformations ? (
+                      <div className="bg-[#111318] rounded-lg p-4 border border-[#1F2228] mb-4">
+                        <p className="text-[#EDEEF0] font-medium mb-1">
+                          Apply transformations first
+                        </p>
+                        <p className="text-sm text-[#9CA3AF]">
+                          You have selected AI transformations. Please click "Apply Transformations" to see the result before using this image.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-[#9CA3AF]">
+                        Current image URL ready for use
+                      </div>
+                    )}
 
                     <div className="flex gap-3 justify-center">
                       <Button
                         onClick={handleSelectImage}
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        disabled={!!(isTransforming || (hasActiveTransformations() && !hasAppliedTransformations))}
+                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Check className="h-4 w-4 mr-2" />
                         Use This Image
@@ -701,7 +834,7 @@ export default function ImageUploadModal({
                       <Button
                         onClick={handleClose}
                         variant="outline"
-                        className="border-slate-600 hover:bg-slate-700"
+                        className="border-[#1F2228] text-[#A1A1AA] hover:bg-[#16181D] hover:text-[#EDEEF0]"
                       >
                         Cancel
                       </Button>

@@ -15,7 +15,7 @@ import { BarLoader } from "react-spinners";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { LayoutDashboard } from "lucide-react";
-import Image from "next/image";
+import Logo from "./logo";
 
 export default function Header() {
   const { isLoading, isAuthenticated } = useStoreUser();
@@ -42,30 +42,30 @@ export default function Header() {
   return (
     <header className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl px-4">
       {/* Center - Glass Navigation Container */}
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between gap-2">
+      <div 
+        className="backdrop-blur-md border border-[#1F2228] rounded-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between gap-2"
+        style={{
+          background: "linear-gradient(180deg, #0B0D10 0%, #0E1117 40%, #111318 100%)",
+        }}
+      >
         {/* Logo */}
-        <Link href={isAuthenticated ? "/feed" : "/"} className="shrink-0">
-          <Image
-            src="/logo.png"
-            alt="Creatr Logo"
-            width={96}
-            height={32}
-            className="h-8 sm:h-10 w-auto object-contain"
-          />
-        </Link>
+        <Logo 
+          href={isAuthenticated ? "/feed" : "/"} 
+          size="md"
+        />
 
         {/* Navigation for landing page only - Hidden on mobile to save space */}
         {path === "/" && (
           <div className="hidden lg:flex space-x-6 flex-1 justify-center">
             <Link
               href="#features"
-              className="text-white font-medium transition-all duration-300 hover:text-purple-300 cursor-pointer"
+              className="text-[#EDEEF0] font-medium transition-all duration-300 hover:text-[#D1D5DB] cursor-pointer"
             >
               Features
             </Link>
             <Link
               href="#testimonials"
-              className="text-white font-medium transition-all duration-300 hover:text-purple-300 cursor-pointer"
+              className="text-[#EDEEF0] font-medium transition-all duration-300 hover:text-[#D1D5DB] cursor-pointer"
             >
               Testimonials
             </Link>
@@ -88,22 +88,19 @@ export default function Header() {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-8 h-8 rounded-lg border border-white/20",
+                  avatarBox: "w-8 h-8 rounded-lg border border-[#1F2228]",
                   userButtonPopoverCard:
-                    "shadow-xl backdrop-blur-md bg-slate-900/90 border border-white/20",
-                  userPreviewMainIdentifier: "font-semibold text-white",
+                    "shadow-xl backdrop-blur-md bg-[#111318] border border-[#1F2228]",
+                  userPreviewMainIdentifier: "font-semibold text-[#EDEEF0]",
                 },
               }}
             />
 
             {/* Explicit logout button (modern API) */}
             <SignOutButton redirectUrl="/">
-              <button
-                className="hidden sm:inline-block px-3 py-1 rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 text-sm"
-                aria-label="Sign out"
-              >
+              <Button variant="glass" size="sm" className="hidden sm:inline-flex">
                 Logout
-              </button>
+              </Button>
             </SignOutButton>
           </SignedIn>
 

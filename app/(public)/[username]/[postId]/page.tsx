@@ -126,10 +126,10 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
 
   if (postLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-slate-400">Loading post...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A1A1AA] mx-auto mb-4"></div>
+          <p className="text-[#6B7280]">Loading post...</p>
         </div>
       </div>
     );
@@ -199,7 +199,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen text-[#A1A1AA]">
       <PublicHeader link={`/${username}`} title="Back to Profile" />
 
       <div className="max-w-4xl mx-auto px-6 py-8">
@@ -243,17 +243,17 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
                   </div>
 
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-[#EDEEF0]">
                       {post.author.name}
                     </p>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-[#6B7280]">
                       @{post.author.username}
                     </p>
                   </div>
                 </div>
               </Link>
 
-              <div className="text-right text-sm text-slate-400">
+              <div className="text-right text-sm text-[#6B7280]">
                 {post.publishedAt && (
                   <div className="flex items-center gap-1 mb-1">
                     <Calendar className="h-4 w-4" />
@@ -277,7 +277,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    className="bg-zinc-800/50 text-[#A1A1AA] border-zinc-700"
                   >
                     {tag}
                   </Badge>
@@ -299,7 +299,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
               className={`flex items-center gap-2 ${
                 hasLiked
                   ? "text-red-400 hover:text-red-300"
-                  : "text-slate-400 hover:text-white"
+                  : "text-[#6B7280] hover:text-[#EDEEF0]"
               }`}
               disabled={toggleLike.isLoading}
             >
@@ -307,7 +307,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
               {post.likeCount.toLocaleString()}
             </Button>
 
-            <div className="flex items-center gap-2 text-slate-400">
+            <div className="flex items-center gap-2 text-[#6B7280]">
               <MessageCircle className="h-5 w-5" />
               {comments?.length || 0} comments
             </div>
@@ -316,7 +316,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
 
         {/* Comments Section */}
         <div className="mt-12 space-y-6">
-          <h2 className="text-2xl font-bold text-white">Comments</h2>
+          <h2 className="text-2xl font-bold text-[#EDEEF0]">Comments</h2>
 
           {currentUser ? (
             <Card className="card-glass">
@@ -328,13 +328,13 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
                       setCommentContent(e.target.value)
                     }
                     placeholder="Write a comment..."
-                    className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 resize-none"
+                    className="bg-slate-800 border-slate-600 text-[#EDEEF0] placeholder:text-[#6B7280] resize-none"
                     rows={3}
                     maxLength={1000}
                   />
 
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#4B5563]">
                       {commentContent.length}/1000 characters
                     </p>
                     <Button
@@ -356,7 +356,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
           ) : (
             <Card className="card-glass">
               <CardContent className="p-6 text-center">
-                <p className="text-slate-400 mb-4">
+                <p className="text-[#6B7280] mb-4">
                   Sign in to join the conversation
                 </p>
                 <Link href="/sign-in">
@@ -393,10 +393,10 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
                         </div>
 
                         <div>
-                          <p className="font-medium text-white">
+                          <p className="font-medium text-[#EDEEF0]">
                             {comment.author?.name || "Anonymous"}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-[#6B7280]">
                             {new Date(comment.createdAt).toLocaleDateString(
                               "en-US",
                               {
@@ -419,14 +419,14 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
                             onClick={() => handleDeleteComment(comment._id)}
                             variant="ghost"
                             size="sm"
-                            className="text-slate-400 hover:text-red-400"
+                            className="text-[#6B7280] hover:text-[#A1A1AA]"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
                     </div>
 
-                    <p className="text-slate-300 whitespace-pre-wrap">
+                    <p className="text-[#A1A1AA] whitespace-pre-wrap">
                       {comment.content}
                     </p>
                   </CardContent>
@@ -450,50 +450,50 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
       {/* Custom prose styles */}
       <style jsx global>{`
         .prose-invert h1 {
-          color: white;
+          color: #EDEEF0;
           font-weight: 700;
           font-size: 2.5rem;
           margin: 1.5rem 0;
         }
         .prose-invert h2 {
-          color: white;
+          color: #D1D5DB;
           font-weight: 600;
           font-size: 2rem;
           margin: 1.25rem 0;
         }
         .prose-invert h3 {
-          color: white;
+          color: #D1D5DB;
           font-weight: 600;
           font-size: 1.5rem;
           margin: 1rem 0;
         }
         .prose-invert p {
-          color: rgb(203, 213, 225);
+          color: #A1A1AA;
           line-height: 1.7;
           margin: 1rem 0;
         }
         .prose-invert blockquote {
-          border-left: 4px solid rgb(147, 51, 234);
-          color: rgb(203, 213, 225);
+          border-left: 4px solid #6B7280;
+          color: #A1A1AA;
           padding-left: 1rem;
           margin: 1.5rem 0;
           font-style: italic;
         }
         .prose-invert a {
-          color: rgb(147, 51, 234);
+          color: #D1D5DB;
         }
         .prose-invert a:hover {
-          color: rgb(168, 85, 247);
+          color: #EDEEF0;
         }
         .prose-invert code {
           background: rgb(51, 65, 85);
-          color: rgb(248, 113, 113);
+          color: #A1A1AA;
           padding: 0.125rem 0.25rem;
           border-radius: 0.25rem;
         }
         .prose-invert pre {
           background: rgb(30, 41, 59);
-          color: white;
+          color: #EDEEF0;
           padding: 1rem;
           border-radius: 0.5rem;
           border: 1px solid rgb(71, 85, 105);
@@ -501,7 +501,7 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
         }
         .prose-invert ul,
         .prose-invert ol {
-          color: rgb(203, 213, 225);
+          color: #A1A1AA;
           padding-left: 1.5rem;
         }
         .prose-invert li {
@@ -512,10 +512,10 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
           margin: 1.5rem 0;
         }
         .prose-invert strong {
-          color: white;
+          color: #EDEEF0;
         }
         .prose-invert em {
-          color: rgb(203, 213, 225);
+          color: #A1A1AA;
         }
       `}</style>
     </div>

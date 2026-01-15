@@ -108,6 +108,7 @@ export default function PostEditorContent({
   // Import CSS dynamically on client side
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // @ts-ignore - CSS file doesn't have TypeScript declarations
       import("react-quill-new/dist/quill.snow.css");
     }
   }, []);
@@ -173,8 +174,8 @@ export default function PostEditorContent({
 
   return (
     <>
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="space-y-5">
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <div className="space-y-8">
           {/* Featured Image */}
           {watchedValues.featuredImage ? (
             <div className="relative group">
@@ -193,7 +194,7 @@ export default function PostEditorContent({
                 </Button>
                 <Button
                   onClick={() => setValue("featuredImage", "")}
-                  variant="destructive"
+                  variant="outline"
                   size="sm"
                 >
                   Remove
@@ -203,30 +204,37 @@ export default function PostEditorContent({
           ) : (
             <button
               onClick={() => onImageUpload("featured")}
-              className="w-full h-36 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center space-y-4 hover:border-slate-500 transition-colors group"
+              className="w-full h-36 border border-[#1F2228] rounded-xl flex flex-col items-center justify-center space-y-4 hover:border-[#E5E7EB]/20 hover:bg-[#111318]/50 transition-all duration-200 group"
             >
-              <ImageIcon className="h-12 w-12 text-slate-400 group-hover:text-slate-300" />
+              <ImageIcon className="h-10 w-10 text-[#9CA3AF] group-hover:text-[#D1D5DB] transition-colors" />
               <div className="text-center">
-                <p className="text-slate-300 text-lg font-medium">
+                <p className="text-[#A1A1AA] text-base font-medium">
                   Add a featured image
                 </p>
-                <p className="text-slate-500 text-sm mt-1">
-                  Upload and transform with AI
+                <p className="text-[#6B7280] text-sm mt-1">
+                  Optional • Upload and transform with AI
                 </p>
               </div>
             </button>
           )}
 
           {/* Title */}
-          <div>
-            <Input
-              {...register("title")}
-              placeholder="Post title..."
-              className="border-0 text-4xl font-bold bg-transparent placeholder:text-slate-500 text-white p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
-              style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
-            />
+          <div className="space-y-3">
+            <div className="relative">
+              <Input
+                {...register("title")}
+                placeholder="Give your story a powerful title…"
+                className={`border-0 text-5xl font-bold bg-transparent placeholder:text-[#6B7280] p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 pb-3 border-b border-[#1F2228] focus:border-[#E5E7EB]/20 transition-all duration-200 ${
+                  watchedValues.title ? "title-metallic" : "text-[#EDEEF0]"
+                }`}
+                style={{ 
+                  fontSize: "3rem", 
+                  lineHeight: "1.2",
+                }}
+              />
+            </div>
             {errors.title && (
-              <p className="text-red-400 mt-2">{errors.title.message}</p>
+              <p className="text-[#9CA3AF] mt-2 text-sm">{errors.title.message}</p>
             )}
           </div>
 
@@ -236,138 +244,185 @@ export default function PostEditorContent({
               <Button
                 onClick={() => handleAI("generate")}
                 disabled={!hasTitle || isGenerating || isImproving}
-                variant="outline"
+                variant="primary"
                 size="sm"
-                className="border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white disabled:opacity-50 w-full"
+                className="w-full"
               >
                 <Wand2 className="h-4 w-4 mr-2" />
                 Generate Content with AI
               </Button>
             ) : (
-              <div className="grid grid-cols-3 w-full gap-2">
+              <div className="grid grid-cols-3 w-full gap-3">
                 {(
                   [
-                    { type: "enhance" as const, icon: Sparkles, color: "green" },
-                    { type: "expand" as const, icon: Plus, color: "blue" },
-                    { type: "simplify" as const, icon: Minus, color: "orange" },
+                    { type: "enhance" as const, icon: Sparkles, label: "Enhance" },
+                    { type: "expand" as const, icon: Plus, label: "Expand" },
+                    { type: "simplify" as const, icon: Minus, label: "Simplify" },
                   ] as const
-                ).map(({ type, icon: Icon, color }) => (
+                ).map(({ type, icon: Icon, label }) => (
                   <Button
                     key={type}
                     onClick={() => handleAI("improve", type)}
                     disabled={isGenerating || isImproving}
-                    variant="outline"
+                    variant="primary"
                     size="sm"
-                    className={`border-${color}-500 text-${color}-400 hover:bg-${color}-500 hover:text-white disabled:opacity-50`}
+                    className="transition-all duration-200"
                   >
                     <Icon className="h-4 w-4 mr-2" />
-                    AI {type.charAt(0).toUpperCase() + type.slice(1)}
+                    {label}
                   </Button>
                 ))}
               </div>
             )}
             {!hasTitle && (
-              <p className="text-xs text-slate-400 w-full pt-2">
+              <p className="text-xs text-[#6B7280] w-full pt-2">
                 Add a title to enable AI content generation
               </p>
             )}
           </div>
 
           {(isGenerating || isImproving) && (
-            <BarLoader width={"95%"} color="#D8B4FE" />
+            <BarLoader width={"95%"} color="#9CA3AF" />
           )}
 
           {/* Editor */}
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none bg-[#111318] rounded-xl p-6 border border-[#1F2228] relative">
+            {!hasTitle && (
+              <div className="absolute inset-0 bg-[#0B0D10]/80 backdrop-blur-sm rounded-xl z-50 flex items-center justify-center">
+                <div className="text-center space-y-2">
+                  <p className="text-[#9CA3AF] text-lg font-medium">
+                    Add a title to start writing
+                  </p>
+                  <p className="text-[#6B7280] text-sm">
+                    Your post needs a powerful title before you can begin editing
+                  </p>
+                </div>
+              </div>
+            )}
             <ReactQuill
               // @ts-expect-error - react-quill-new types don't properly support ref
               ref={quillRef}
               theme="snow"
               value={watchedValues.content || ""}
               onChange={(content: string) => setValue("content", content)}
-              modules={getQuillModules()}
+              readOnly={!hasTitle}
+              modules={hasTitle ? getQuillModules() : { toolbar: false }}
               formats={quillConfig.formats}
-              placeholder="Tell your story... or use AI to generate content!"
+              placeholder={hasTitle ? "Start writing… or let AI help you shape your thoughts." : ""}
               style={{
                 minHeight: "400px",
                 fontSize: "1.125rem",
                 lineHeight: "1.7",
+                opacity: hasTitle ? 1 : 0.5,
+                pointerEvents: hasTitle ? "auto" : "none",
               }}
             />
             {errors.content && (
-              <p className="text-red-400 mt-2">{errors.content.message}</p>
+              <p className="text-[#9CA3AF] mt-2 text-sm">{errors.content.message}</p>
             )}
           </div>
         </div>
       </main>
 
       <style jsx global>{`
+        .title-metallic {
+          background: linear-gradient(90deg, #F9FAFB, #E5E7EB, #9CA3AF, #F3F4F6) !important;
+          -webkit-background-clip: text !important;
+          background-clip: text !important;
+          -webkit-text-fill-color: transparent !important;
+          text-fill-color: transparent !important;
+        }
+        .ql-container {
+          border: 1px solid #1F2228 !important;
+          border-top: none !important;
+          border-radius: 0 0 8px 8px !important;
+          background: #16181D !important;
+        }
         .ql-editor {
-          color: white !important;
+          color: #A1A1AA !important;
           font-size: 1.125rem !important;
           line-height: 1.7 !important;
-          padding: 0 !important;
+          padding: 1.5rem !important;
           min-height: 400px !important;
         }
         .ql-editor::before {
-          color: rgb(100, 116, 139) !important;
+          color: #6B7280 !important;
+          font-style: italic !important;
+          font-weight: 300 !important;
+        }
+        .ql-editor .ql-cursor {
+          border-left: 2px solid #E5E7EB !important;
         }
         .ql-toolbar {
-          border: none !important;
-          padding: 0 0 1rem 0 !important;
+          border: 1px solid #1F2228 !important;
+          padding: 0.75rem 1rem !important;
           position: sticky !important;
           top: 80px !important;
-          background: rgb(15, 23, 42) !important;
+          background: #111318 !important;
           z-index: 30 !important;
-          border-radius: 8px !important;
-          margin-bottom: 1rem !important;
+          border-radius: 8px 8px 0 0 !important;
+          margin-bottom: 0 !important;
+          display: flex !important;
+          gap: 0.5rem !important;
         }
-        .ql-container {
-          border: none !important;
+        .ql-toolbar.ql-disabled {
+          opacity: 0.4 !important;
+          pointer-events: none !important;
         }
         .ql-snow .ql-tooltip {
-          background: rgb(30, 41, 59) !important;
-          border: 1px solid rgb(71, 85, 105) !important;
-          color: white !important;
+          background: #111318 !important;
+          border: 1px solid #1F2228 !important;
+          color: #EDEEF0 !important;
         }
         .ql-snow .ql-picker {
-          color: white !important;
+          color: #9CA3AF !important;
         }
         .ql-snow .ql-picker-options {
-          background: rgb(30, 41, 59) !important;
-          border: 1px solid rgb(71, 85, 105) !important;
+          background: #111318 !important;
+          border: 1px solid #1F2228 !important;
         }
         .ql-snow .ql-fill,
         .ql-snow .ql-stroke.ql-fill {
-          fill: white !important;
+          fill: #9CA3AF !important;
         }
         .ql-snow .ql-stroke {
-          stroke: white !important;
+          stroke: #9CA3AF !important;
+        }
+        .ql-snow .ql-picker-label:hover,
+        .ql-snow button:hover,
+        .ql-snow button.ql-active {
+          color: #E5E7EB !important;
+        }
+        .ql-snow .ql-picker-label:hover .ql-stroke,
+        .ql-snow button:hover .ql-stroke,
+        .ql-snow button.ql-active .ql-stroke {
+          stroke: #E5E7EB !important;
         }
         .ql-editor h2 {
           font-size: 2rem !important;
           font-weight: 600 !important;
-          color: white !important;
+          color: #D1D5DB !important;
         }
         .ql-editor h3 {
           font-size: 1.5rem !important;
           font-weight: 600 !important;
-          color: white !important;
+          color: #D1D5DB !important;
         }
         .ql-editor blockquote {
-          border-left: 4px solid rgb(147, 51, 234) !important;
-          color: rgb(203, 213, 225) !important;
+          border-left: 4px solid #6B7280 !important;
+          color: #A1A1AA !important;
           padding-left: 1rem !important;
           font-style: italic !important;
         }
         .ql-editor a {
-          color: rgb(147, 51, 234) !important;
+          color: #D1D5DB !important;
         }
         .ql-editor code {
-          background: rgb(51, 65, 85) !important;
-          color: rgb(248, 113, 113) !important;
+          background: #111318 !important;
+          color: #A1A1AA !important;
           padding: 0.125rem 0.25rem !important;
           border-radius: 0.25rem !important;
+          border: 1px solid #1F2228 !important;
         }
       `}</style>
     </>
