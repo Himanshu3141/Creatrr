@@ -102,39 +102,6 @@ const Home = () => {
                 </Button>
               </Link>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 sm:gap-8 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[
-                    "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop",
-                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
-                    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop",
-                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop",
-                  ].map((src, i) => (
-                    <div key={i} className="relative w-6 h-6 sm:w-8 sm:h-8">
-                      <Image
-                        src={src}
-                        alt={`Creator ${i + 1}`}
-                        fill
-                        className="rounded-full border-2 border-black object-cover"
-                        sizes="32px"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <span>10k+ creators</span>
-              </div>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-                <span className="ml-1">4.9/5</span>
-              </div>
-            </div>
           </div>
 
           {/* Interactive 3D-style elements */}
