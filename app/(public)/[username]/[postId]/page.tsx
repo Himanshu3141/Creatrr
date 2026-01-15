@@ -52,15 +52,24 @@ type Comment = Doc<"comments"> & {
 };
 
 interface PostPageProps {
-  params: {
+  params: Promise<{
     username: string;
     postId: string;
-  };
+  }>;
 }
 
 const PostPage: React.FC<PostPageProps> = ({ params }) => {
-  const { username, postId } = params;
+  const { username, postId } = React.use(params);
   const { user: currentUser } = useUser();
+
+  // Validate postId - Convex IDs are typically alphanumeric and don't match common route names
+  // Common invalid values: "followers", "edit", "create", "settings", etc.
+  const invalidPostIds = ["followers", "edit", "create", "settings", "posts", "dashboard"];
+  const isValidPostId = postId && !invalidPostIds.includes(postId.toLowerCase()) && postId.length > 10;
+
+  if (!isValidPostId) {
+    notFound();
+  }
 
   const { data: currentConvexUser } = useConvexQuery(
     convexApi.users.getCurrentUser,
@@ -75,22 +84,25 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
     error: postError,
   } = useConvexQuery<PostWithAuthor | null>(
     convexApi.public.getPublishedPost,
-    {
-      username,
-      postId: postId as Id<"posts">,
-    }
+    isValidPostId
+      ? {
+          username,
+          postId: postId as Id<"posts">,
+        }
+      : "skip"
   );
 
   const { data: comments, isLoading: commentsLoading } = useConvexQuery<
     Comment[] | undefined
-  >(convexApi.comments.getPostComments, {
-    postId: postId as Id<"posts">,
-  });
+  >(
+    convexApi.comments.getPostComments,
+    isValidPostId ? { postId: postId as Id<"posts"> } : "skip"
+  );
 
   // Get like status for current user
   const { data: hasLiked } = useConvexQuery<boolean | undefined>(
     convexApi.likes.hasUserLiked,
-    currentUser ? { postId: postId as Id<"posts"> } : "skip"
+    currentUser && isValidPostId ? { postId: postId as Id<"posts"> } : "skip"
   );
 
   const toggleLike = useConvexMutation(convexApi.likes.toggleLike);
@@ -106,11 +118,11 @@ const PostPage: React.FC<PostPageProps> = ({ params }) => {
 
   // Track view when post loads
   useEffect(() => {
-    if (post && !postLoading) {
+    if (post && !postLoading && isValidPostId) {
       incrementView.mutate({ postId: postId as Id<"posts"> });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postLoading, post?._id]);
+  }, [postLoading, post?._id, isValidPostId]);
 
   if (postLoading) {
     return (

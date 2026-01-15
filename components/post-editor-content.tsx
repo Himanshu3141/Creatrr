@@ -13,10 +13,6 @@ import { z } from "zod";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-if (typeof window !== "undefined") {
-  require("react-quill-new/dist/quill.snow.css");
-}
-
 const postSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   content: z.string().min(1, "Content is required"),
@@ -108,6 +104,13 @@ export default function PostEditorContent({
       handlers: { image: () => onImageUpload("content") },
     },
   });
+
+  // Import CSS dynamically on client side
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("react-quill-new/dist/quill.snow.css");
+    }
+  }, []);
 
   useEffect(() => {
     if (quillRef.current) {

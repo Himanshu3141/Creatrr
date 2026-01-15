@@ -30,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             appearance={{
               baseTheme: shadesOfPurple,
             }}
+            afterSignOutUrl="/"
           >
             <ConvexClientProvider>
               <Header />

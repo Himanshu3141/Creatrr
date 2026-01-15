@@ -82,6 +82,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onDuplicate,
   className = "",
 }) => {
+  
   // Get status badge configuration
   const getStatusBadge = (post: Post): StatusBadgeConfig => {
     if (post.status === "published") {

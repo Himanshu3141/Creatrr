@@ -41,6 +41,7 @@ interface PostEditorHeaderProps {
   mode: "create" | "edit";
   initialData?: PostData | null;
   isPublishing: boolean;
+  hasTitle: boolean;
   onSave: (silent?: boolean) => void;
   onPublish: () => void;
   onSchedule: () => void;
@@ -52,6 +53,7 @@ export default function PostEditorHeader({
   mode,
   initialData,
   isPublishing,
+  hasTitle,
   onSave,
   onPublish,
   onSchedule,
@@ -102,10 +104,11 @@ export default function PostEditorHeader({
           {!isEdit && (
             <Button
               onClick={() => onSave(false)}
-              disabled={isPublishing}
+              disabled={isPublishing || !hasTitle}
               variant="ghost"
               size="sm"
               className="text-slate-400 hover:text-white"
+              title={!hasTitle ? "Title is required to save" : ""}
             >
               {isPublishing ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -118,11 +121,12 @@ export default function PostEditorHeader({
           {isEdit ? (
             <Button
               variant={"primary"}
-              disabled={isPublishing}
+              disabled={isPublishing || !hasTitle}
               onClick={() => {
                 onPublish();
                 setIsPublishMenuOpen(false);
               }}
+              title={!hasTitle ? "Title is required to publish" : ""}
             >
               {isPublishing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -137,7 +141,11 @@ export default function PostEditorHeader({
               onOpenChange={setIsPublishMenuOpen}
             >
               <DropdownMenuTrigger asChild>
-                <Button variant={"primary"} disabled={isPublishing}>
+                <Button 
+                  variant={"primary"} 
+                  disabled={isPublishing || !hasTitle}
+                  title={!hasTitle ? "Title is required to publish" : ""}
+                >
                   {isPublishing ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
@@ -149,18 +157,24 @@ export default function PostEditorHeader({
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
                   onClick={() => {
-                    onPublish();
-                    setIsPublishMenuOpen(false);
+                    if (hasTitle) {
+                      onPublish();
+                      setIsPublishMenuOpen(false);
+                    }
                   }}
+                  disabled={!hasTitle}
                 >
                   <Send className="h-4 w-4 mr-2" />
                   Publish now
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    onSchedule();
-                    setIsPublishMenuOpen(false);
+                    if (hasTitle) {
+                      onSchedule();
+                      setIsPublishMenuOpen(false);
+                    }
                   }}
+                  disabled={!hasTitle}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Schedule for later

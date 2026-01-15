@@ -30,6 +30,16 @@ export const create = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    // Validate title is required
+    if (!args.title || args.title.trim().length === 0) {
+      throw new Error("Title is required to create or save a post");
+    }
+
+    // Validate content is required for published posts
+    if (args.status === "published" && (!args.content || args.content.trim() === "" || args.content === "<p><br></p>")) {
+      throw new Error("Content is required to publish a post");
+    }
+
     const user = await ctx.db
       .query("users")
       .filter(q => q.eq(q.field("tokenIdentifier"), identity.tokenIdentifier))
@@ -127,6 +137,18 @@ export const update = mutation({
     if (!post) throw new Error("Post not found");
 
     if (post.authorId !== user._id) throw new Error("Not authorized");
+
+    // Validate title if provided
+    if (args.title !== undefined && (!args.title || args.title.trim().length === 0)) {
+      throw new Error("Title cannot be empty");
+    }
+
+    // Validate content for published posts
+    const newStatus = args.status || post.status;
+    const newContent = args.content !== undefined ? args.content : post.content;
+    if (newStatus === "published" && (!newContent || newContent.trim() === "" || newContent === "<p><br></p>")) {
+      throw new Error("Content is required to publish a post");
+    }
 
     const now = Date.now();
 

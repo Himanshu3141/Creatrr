@@ -14,11 +14,12 @@ import Link from "next/link";
 import PostCard from "@/components/post-card";
 import type { Post } from "@/components/post-card";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
+import PublicHeader from "./_components/public-header";
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 
 type PublicUser = Doc<"users">;
@@ -32,7 +33,7 @@ type PublishedPostsResponse = {
 const convexApi = api as any;
 
 export default function ProfilePage({ params }: ProfilePageProps) {
-  const { username } = params;
+  const { username } = React.use(params);
   const { user: currentUser } = useUser();
 
   // Get user profile
@@ -106,15 +107,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      {/* Simple back link header */}
-      <div className="px-6 pt-6">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-slate-400 hover:text-white transition-colors"
-        >
-          ← Back to Home
-        </Link>
-      </div>
+      <PublicHeader link="/" title="Back to Home" />
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Profile Header */}

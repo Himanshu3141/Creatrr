@@ -106,8 +106,24 @@ export default function PostEditor({
       silent = false
     ): Promise<Id<"posts"> | undefined> => {
       try {
+        // Validate title is required for all actions
+        if (!data.title || data.title.trim().length === 0) {
+          if (!silent) {
+            toast.error("Title is required to save or publish a post");
+          }
+          throw new Error("Title is required");
+        }
+
+        // For publishing, ensure content exists
+        if ((action === "publish" || action === "schedule") && (!data.content || data.content.trim() === "" || data.content === "<p><br></p>")) {
+          if (!silent) {
+            toast.error("Content is required to publish a post");
+          }
+          throw new Error("Content is required to publish");
+        }
+
         const postData = {
-          title: data.title,
+          title: data.title.trim(),
           content: data.content,
           category: data.category || undefined,
           tags: data.tags,
@@ -211,6 +227,7 @@ export default function PostEditor({
         mode={mode}
         initialData={initialData}
         isPublishing={isCreateLoading || isUpdating}
+        hasTitle={!!watchedValues.title?.trim()}
         onSave={handleSave}
         onPublish={handlePublish}
         onSchedule={handleSchedule}
