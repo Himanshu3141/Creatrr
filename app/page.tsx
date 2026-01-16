@@ -122,15 +122,7 @@ const Home = () => {
       ></div>
 
       {/* Hero Section */}
-      <section className="relative z-10 mt-32 sm:mt-40 lg:mt-48 px-4 sm:px-6 py-20 sm:py-28 lg:py-32 min-h-[85vh] flex items-center">
-        {/* Subtle ambient background gradient */}
-        <div 
-          className="absolute inset-0 opacity-30 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse 80% 50% at 30% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-                         radial-gradient(ellipse 80% 50% at 70% 50%, rgba(255, 255, 255, 0.015) 0%, transparent 50%)`,
-          }}
-        ></div>
+      <section className="bg-vignette-premium relative z-10 mt-32 sm:mt-40 lg:mt-48 px-4 sm:px-6 py-20 sm:py-28 lg:py-32 min-h-[85vh] flex items-center">
         
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 lg:gap-20 xl:gap-24 items-center relative z-10">
           {/* Left Column - Headings */}
@@ -282,8 +274,8 @@ const Home = () => {
                     onClick={() => setActiveTab(index)}
                     className={`w-full justify-start h-auto p-6 ${
                       activeTab === index
-                        ? "bg-gradient-to-b from-[#16181D] to-[#0B0D10] border border-[#1F2228]"
-                        : ""
+                        ? "bg-gradient-to-br from-[#0A0A0F] via-[#0F0F19] to-[#0A0A0F] border border-[#1F2228]"
+                        : "bg-gradient-to-br from-[#0A0A0F] via-[#0F0F19] to-[#0A0A0F] border border-[#1F2228]"
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -332,7 +324,7 @@ const Home = () => {
       </section>
 
       {/* Social Proof */}
-      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 bg-gradient-to-r from-gray-900/50 to-purple-900/20">
+      <section className="bg-vignette-premium relative z-10 py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-12 sm:mb-16">
             <span className="gradient-text-primary">

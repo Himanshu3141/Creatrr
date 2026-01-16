@@ -342,5 +342,40 @@ p, body {
 
 /* Glass Card Effect - Complex background/border combination used frequently */
 .card-glass {
-  @apply bg-[#111318] border-[#1F2228] hover:border-[#1F2228];
+  background: linear-gradient(135deg, rgba(10, 10, 15, 0.95) 0%, rgba(15, 15, 25, 0.98) 50%, rgba(10, 10, 15, 0.95) 100%);
+  @apply border-[#1F2228] hover:border-[#1F2228];
+}
+
+/* Premium Vignette Background - Dark center with subtle deep blue/purple edges */
+.bg-vignette-premium {
+  position: relative;
+  background: 
+    /* Radial vignette - dark center fading to edges */
+    radial-gradient(ellipse 150% 100% at center, #0A0A0F 0%, #0F0F19 60%, #0A0A0F 100%),
+    /* Horizontal gradient - subtle cool tones at edges */
+    linear-gradient(
+      90deg,
+      rgba(59, 50, 90, 0.15) 0%,      /* Deep purple-blue left edge */
+      rgba(45, 45, 70, 0.08) 15%,    /* Subtle fade */
+      #0A0A0F 45%,                   /* Near-black center left */
+      #0A0A0F 55%,                   /* Near-black center right */
+      rgba(45, 45, 70, 0.08) 85%,    /* Subtle fade */
+      rgba(59, 50, 90, 0.15) 100%     /* Deep purple-blue right edge */
+    );
+  background-attachment: fixed;
+}
+
+/* Optional: Add soft vignette overlay effect for additional depth */
+.bg-vignette-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
 }
